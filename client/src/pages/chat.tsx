@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Bot, Sparkles } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Bot, Sparkles, LogOut } from "lucide-react";
 import type { Conversation, Message } from "@shared/schema";
 
 interface ConversationWithMessages extends Conversation {
@@ -21,6 +22,7 @@ export default function ChatPage() {
   const [streamingContent, setStreamingContent] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user, logout, isLoggingOut } = useAuth();
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -178,7 +180,24 @@ export default function ChatPage() {
                 {activeConversation?.title || "AI Companion"}
               </span>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              {user && (
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  {user.username}
+                </span>
+              )}
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => logout()}
+                disabled={isLoggingOut}
+                data-testid="button-logout"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </header>
 
           <div className="flex-1 overflow-hidden">
